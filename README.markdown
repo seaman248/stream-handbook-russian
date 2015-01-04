@@ -23,9 +23,9 @@
 	var fs = require('fs');
 
 	var server = http.createServer(function (req, res) {
-	    fs.readFile(__dirname + '/data.txt', function (err, data) {
-	        res.end(data);
-	    });
+		fs.readFile(__dirname + '/data.txt', function (err, data) {
+			res.end(data);
+		});
 	});
 	server.listen(8000);
 ``` 
@@ -41,8 +41,8 @@
 	var fs = require('fs');
 
 	var server = http.createServer(function (req, res) {
-	    var stream = fs.createReadStream(__dirname + '/data.txt');
-	    stream.pipe(res);
+		var stream = fs.createReadStream(__dirname + '/data.txt');
+		stream.pipe(res);
 	});
 	server.listen(8000);
 ```
@@ -59,8 +59,8 @@
 	var oppressor = require('oppressor');
 
 	var server = http.createServer(function (req, res) {
-	    var stream = fs.createReadStream(__dirname + '/data.txt');
-	    stream.pipe(oppressor(req)).pipe(res);
+		var stream = fs.createReadStream(__dirname + '/data.txt');
+		stream.pipe(oppressor(req)).pipe(res);
 	});
 	server.listen(8000);
 ```
@@ -78,7 +78,7 @@
 	- duplex
 	- "classic"
 
-### pipe	
+### pipe
 Все типы потоков используют .pipe() для объединения ввода и вывода. 
 
 .pipe() - это просто функция, которая принимает readable поток src и перенаправляет вывод в writable поток dst: 
@@ -177,17 +177,17 @@ rs.push(null) говорит о том, что данные закончили �
 	var c = 97 - 1;
 
 	rs._read = function () {
-	    if (c >= 'z'.charCodeAt(0)) return rs.push(null);
+		if (c >= 'z'.charCodeAt(0)) return rs.push(null);
 
-	    setTimeout(function () {
-	        rs.push(String.fromCharCode(++c));
-	    }, 100);
+		setTimeout(function () {
+			rs.push(String.fromCharCode(++c));
+		}, 100);
 	};
 
 	rs.pipe(process.stdout);
 
 	process.on('exit', function () {
-	    console.error('\n_read() called ' + (c - 97) + ' times');
+		console.error('\n_read() called ' + (c - 97) + ' times');
 	});
 	process.stdout.on('error', process.exit);
 ```
@@ -214,8 +214,8 @@ rs.push(null) говорит о том, что данные закончили �
 
 ``` js
 	process.stdin.on('readable', function () {
-	    var buf = process.stdin.read();
-	    console.dir(buf);
+		var buf = process.stdin.read();
+		console.dir(buf);
 	});
 ```
 
@@ -237,8 +237,8 @@ rs.push(null) говорит о том, что данные закончили �
 
 ``` js
 	process.stdin.on('readable', function () {
-	    var buf = process.stdin.read(3);
-	    console.dir(buf);
+		var buf = process.stdin.read(3);
+		console.dir(buf);
 	});
 ```
 Запуск этого примера выдаст неполные данные:
@@ -254,9 +254,9 @@ rs.push(null) говорит о том, что данные закончили �
 
 ``` js
 	process.stdin.on('readable', function () {
-	    var buf = process.stdin.read(3);
-	    console.dir(buf);
-	    process.stdin.read(0);
+		var buf = process.stdin.read(3);
+		console.dir(buf);
+		process.stdin.read(0);
 	});
 ```
 ``` 
@@ -275,18 +275,18 @@ rs.push(null) говорит о том, что данные закончили �
 	var offset = 0;
 
 	process.stdin.on('readable', function () {
-	    var buf = process.stdin.read();
-	    if (!buf) return;
-	    for (; offset < buf.length; offset++) {
-	        if (buf[offset] === 0x0a) {
-	            console.dir(buf.slice(0, offset).toString());
-	            buf = buf.slice(offset + 1);
-	            offset = 0;
-	            process.stdin.unshift(buf);
-	            return;
-	        }
-	    }
-	    process.stdin.unshift(buf);
+		var buf = process.stdin.read();
+		if (!buf) return;
+		for (; offset < buf.length; offset++) {
+			if (buf[offset] === 0x0a) {
+				console.dir(buf.slice(0, offset).toString());
+				buf = buf.slice(offset + 1);
+				offset = 0;
+				process.stdin.unshift(buf);
+				return;
+			}
+		}
+		process.stdin.unshift(buf);
 	});
 ```
 ``` 
@@ -320,8 +320,8 @@ Writable-потоки - это потоки, в которые можно пер
 	var Writable = require('stream').Writable;
 	var ws = Writable();
 	ws._write = function (chunk, enc, next) {
-	    console.dir(chunk);
-	    next();
+		console.dir(chunk);
+		next();
 	};
 
 	process.stdin.pipe(ws);		
@@ -353,22 +353,33 @@ Writable-потоки - это потоки, в которые можно пер
 Для того, чтобы сказать потоку для записи, что вы закончили запись, вызовите метод ```.end()```. Можно передать данные, которые будут записаны перед окончанием записи с помощью ```.end(data)```:
 
 ``` js
- 	var fs = require('fs');
- 	var ws = fs.createWriteStream('message.txt');
+	var fs = require('fs');
+	var ws = fs.createWriteStream('message.txt');
 
- 	ws.write('beep ');
+	ws.write('beep ');
 
- 	setTimeout(function () {
- 	    ws.end('boop\n');
- 	}, 1000);
+	setTimeout(function () {
+		ws.end('boop\n');
+	}, 1000);
  ``` 
 
  ``` 
- 	$ node writing1.js 
- 	$ cat message.txt
- 	beep boop
+$ node writing1.js 
+$ cat message.txt
+beep boop
  ```
 
 Метод ```.write()``` возвращает false, когда пришло больше данных, чем указано в ```opts.highWaterMark``` опции, которая передается ```Writable()``` из входящего буфера. 
 
 Если необходимо подождать, пока буфер будет снова пуст, то поможет событие ```'drain'```.
+
+### Потоки transform 
+
+Вы могли слышать про потоки transform, отсылающие нас к through потокам.
+
+Through потоки - это простые readable/writable фильтры, которые изменяют входящие данные и отправляют результат на вывод.
+
+### Дуплексные потоки (Duplex streams)
+
+
+
